@@ -14,21 +14,18 @@
              [prefix-in : parser-tools/lex-sre])
 
 (provide myapl-lexer
-         delimiters
-         verbs
-         nouns)
+         delimiter-tokens
+         value-tokens)
 
-(define-empty-tokens delimiters
+(define-empty-tokens delimiter-tokens
   (OP        ;(
    CP        ;)
    SPACE
    EOF))
 
-(define-tokens verbs
-  (VERB))
-
-(define-tokens nouns
-  (NUMBER
+(define-tokens value-tokens
+  (IDENTIFIER
+   NUMBER
    MODE))
 
 (define myapl-lexer
@@ -38,7 +35,7 @@
    [" " (token-SPACE)]
    [(eof) (token-EOF)]
 
-   [#\= (token-VERB lexeme)]
+   [#\= (token-IDENTIFIER lexeme)]
    
    [(:+ numeric) (token-NUMBER lexeme)]
    [(:or "i" "o") (token-MODE lexeme)]

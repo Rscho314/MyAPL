@@ -15,22 +15,29 @@
   (let* ([type (car expression)]
          [value (cdr expression)])
     (match type
-      ['number
+      ['array
+       (let ([array-values (car value)])
+         (list->vector (map (λ (v) (interpret v environment)) array-values)))]
+      ['scalar
        (string->number (car value))]
-      ['verb
+      ['identifier
        (hash-ref environment (car value))]
       ['procedure-call
        (let* ([operator
               (interpret (car value) environment)]
               [operands
-               (map (lambda (op) (interpret op environment))
-                    (cadr value))])
-         (apply operator operands))]
+               (interpret (cadr value) environment)])
+         (vector-map operator operands))]
 [else (error "AST node could not be evaluated: " value)])))
 
 (define myapl-environment
   (hash
    "=" =))
 
-;(interpret '(procedure-call (verb "=") ((number "4") (number "4"))) myapl-environment)
-;(module mymod #f (myapl-module-begin '(procedure-call (verb "=") ((number "4") (number "4")))))
+#;(map (λ (expr) (interpret expr myapl-environment))
+     (list
+      '(array ((scalar "34")))
+      '(array ((scalar "3") (scalar "4")))
+      '(procedure-call (identifier "=") (array ((scalar "4"))))
+      '(procedure-call (identifier "=") (array ((scalar "3") (scalar "4"))))
+      '(procedure-call (identifier "=") (array ((scalar "3") (scalar "4"))))))
